@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laptop Recommendation System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+        }
+
+        .question-container {
+            display: none;
+            margin-bottom: 20px;
+        }
+
+        .question-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .options {
+            display: grid;
+            gap: 10px;
+        }
+
+        .option {
+            padding: 15px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .option.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .prev-btn {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        .next-btn, .submit-btn {
+            background: #667eea;
+            color: white;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-container {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .laptop-spec {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .spec-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .spec-item i {
+            margin-right: 10px;
+            color: #667eea;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background: #667eea;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Find Your Perfect Laptop</h1>
+            <p>Answer a few questions to get personalized laptop recommendations</p>
+            <div class="progress-bar">
+                <div class="progress"></div>
+            </div>
+        </div>
+
+        <div id="questionnaire"></div>
+
+        <div class="result-container" id="result">
+            <h2>Recommended Laptop Specifications</h2>
+            <div class="laptop-spec">
+                <div class="spec-item">
+                    <i class="fas fa-microchip"></i>
+                    <span id="processor"></span>
+                </div>
+                <div class="spec-item">
+                    <i class="fas fa-memory"></i>
+                    <span id="ram"></span>
+                </div>
+                <div class="spec-item">
+                    <i class="fas fa-desktop"></i>
+                    <span id="graphics"></span>
+                </div>
+                <div class="spec-item">
+                    <i class="fas fa-hdd"></i>
+                    <span id="storage"></span>
+                </div>
+                <div class="spec-item">
+                    <i class="fas fa-laptop"></i>
+                    <span id="display"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "What's your primary use for the laptop?",
+                options: ["General browsing & Office work", "Gaming", "Video editing & 3D rendering", "Programming & Development", "Business & Presentations"]
+            },
+            {
+                question: "What's your budget range?",
+                options: ["$300-$500", "$500-$800", "$800-$1200", "$1200-$2000", "Above $2000"]
+            },
+            {
+                question: "How important is portability to you?",
+                options: ["Very important - I travel frequently", "Somewhat important", "Not important - It'll stay on my desk", "Balance of performance and portability"]
+            },
+            {
+                question: "What size screen do you prefer?",
+                options: ["13-14 inch", "15-16 inch", "17 inch or larger"]
+            },
+            {
+                question: "How much storage do you need?",
+                options: ["256GB", "512GB", "1TB", "2TB or more"]
+            },
+            {
+                question: "Do you plan to play games on this laptop?",
+                options: ["No gaming", "Light gaming", "Moderate gaming", "Heavy gaming"]
+            },
+            {
+                question: "How many programs do you typically run simultaneously?",
+                options: ["1-3 programs", "4-6 programs", "7+ programs"]
+            },
+            {
+                question: "Do you need special features?",
+                options: ["Touchscreen", "Long battery life", "High color accuracy", "Thunderbolt ports", "None specifically"]
+            },
+            {
+                question: "How important is build quality?",
+                options: ["Premium build is a must", "Balanced build quality", "Basic build is fine"]
+            },
+            {
+                question: "What's your preferred brand?",
+                options: ["Dell", "HP", "Lenovo", "Apple", "ASUS", "No preference"]
+            }
+        ];
+
+        let currentQuestion = 0;
+        let answers = [];
+
+        function showQuestion(index) {
+            const questionnaireDiv = document.getElementById('questionnaire');
+            const question = questions[index];
+
+            const questionHTML = `
+                <div class="question-container active">
+                    <div class="question">${question.question}</div>
+                    <div class="options">
+                        ${question.options.map((option, i) => `
+                            <div class="option" onclick="selectOption(${i})">${option}</div>
+                        `).join('')}
+                    </div>
+                    <div class="navigation">
+                        ${index > 0 ? '<button class="prev-btn" onclick="previousQuestion()">Previous</button>' : ''}
+                        ${index < questions.length - 1 
+                            ? '<button class="next-btn" onclick="nextQuestion()">Next</button>'
+                            : '<button class="submit-btn" onclick="showResult()">View My Laptop</button>'
+                        }
+                    </div>
+                </div>
+            `;
+
+            questionnaireDiv.innerHTML = questionHTML;
+            updateProgressBar();
+        }
+
+        function updateProgressBar() {
+            const progress = document.querySelector('.progress');
+            const percentage = ((currentQuestion + 1) / questions.length) * 100;
+            progress.style.width = `${percentage}%`;
+        }
+
+        function selectOption(optionIndex) {
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => option.classList.remove('selected'));
+            options[optionIndex].classList.add('selected');
+            answers[currentQuestion] = optionIndex;
+        }
+
+        function nextQuestion() {
+            if (typeof answers[currentQuestion] === 'undefined') {
+                alert('Please select an option before proceeding');
+                return;
+            }
+            currentQuestion++;
+            showQuestion(currentQuestion);
+        }
+
+        function previousQuestion() {
+            currentQuestion--;
+            showQuestion(currentQuestion);
+        }
+
+        function determineSpecs() {
+            // This is a simplified logic for demonstration
+            let specs = {
+                processor: "Intel Core i5-12500H",
+                ram: "16GB DDR4",
+                graphics: "NVIDIA RTX 3050",
+                storage: "512GB NVMe SSD",
+                display: "15.6\" FHD IPS"
+            };
+
+            // Adjust based on primary use (answers[0])
+            if (answers[0] === 1) { // Gaming
+                specs.processor = "Intel Core i7-12700H";
+                specs.graphics = "NVIDIA RTX 3070";
+                specs.ram = "32GB DDR4";
+            } else if (answers[0] === 2) { // Video editing
+                specs.processor = "Intel Core i9-12900H";
+                specs.ram = "64GB DDR4";
+                specs.storage = "2TB NVMe SSD";
+            }
+
+            // Adjust based on budget (answers[1])
+            if (answers[1] <= 1) {
+                specs.processor = "Intel Core i3-1115G4";
+                specs.graphics = "Intel UHD Graphics";
+                specs.ram = "8GB DDR4";
+            }
+
+            return specs;
+        }
+
+        function showResult() {
+            if (typeof answers[currentQuestion] === 'undefined') {
+                alert('Please select an option before viewing results');
+                return;
+            }
+
+            const specs = determineSpecs();
+            document.getElementById('questionnaire').style.display = 'none';
+            document.getElementById('result').style.display = 'block';
+            
+            document.getElementById('processor').textContent = specs.processor;
+            document.getElementById('ram').textContent = specs.ram;
+            document.getElementById('graphics').textContent = specs.graphics;
+            document.getElementById('storage').textContent = specs.storage;
+            document.getElementById('display').textContent = specs.display;
+        }
+
+        // Start the questionnaire
+        showQuestion(0);
+    </script>
+</body>
+</html> 
