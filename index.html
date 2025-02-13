@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> MYME Laptop Recommendation System</title>
+    <title>Laptop Recommendation System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * {
@@ -78,6 +78,9 @@
             border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .option:hover {
@@ -160,12 +163,49 @@
             transition: width 0.3s ease;
         }
 
+        .info-icon {
+            color: #667eea;
+            font-size: 0.9rem;
+            margin-left: 10px;
+            position: relative;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            width: 250px;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: none;
+            z-index: 100;
+            line-height: 1.4;
+        }
+
+        .info-icon:hover .tooltip {
+            display: block;
+        }
+
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            right: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-width: 5px;
+            border-style: solid;
+            border-color: transparent transparent transparent rgba(0, 0, 0, 0.8);
+        }
+
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>MYME LAPTOP RECOMMENDATIONS</h1>
             <h1>Find Your Perfect Laptop</h1>
             <p>Answer a few questions to get personalized laptop recommendations</p>
             <div class="progress-bar">
@@ -206,43 +246,221 @@
         const questions = [
             {
                 question: "What's your primary use for the laptop?",
-                options: ["General browsing & Office work", "Gaming", "Video editing & 3D rendering", "Programming & Development", "Business & Presentations"]
+                options: [
+                    {
+                        text: "General browsing & Office work",
+                        info: "Best for everyday tasks like web browsing, email, Microsoft Office, and basic multitasking. Ideal for students and home users who don't need high-performance capabilities."
+                    },
+                    {
+                        text: "Gaming",
+                        info: "Optimized for running modern games with dedicated graphics card, better cooling system, and high refresh rate display. Suitable for both casual and competitive gamers."
+                    },
+                    {
+                        text: "Video editing & 3D rendering",
+                        info: "Powerful specifications for handling resource-intensive tasks like video editing, 3D modeling, and rendering. Features high-performance CPU, lots of RAM, and professional-grade graphics."
+                    },
+                    {
+                        text: "Programming & Development",
+                        info: "Balanced configuration for coding, compiling, and running development environments. Good processing power and RAM for running multiple development tools simultaneously."
+                    },
+                    {
+                        text: "Business & Presentations",
+                        info: "Professional-looking laptops with good battery life, reliable performance, and business-focused features like fingerprint readers and webcam privacy shutters."
+                    }
+                ]
             },
             {
                 question: "What's your budget range?",
-                options: ["$300-$500", "$500-$800", "$800-$1200", "$1200-$2000", "Above $2000"]
+                options: [
+                    {
+                        text: "$300-$500",
+                        info: "Entry-level laptops suitable for basic tasks. Expect basic processors, integrated graphics, and standard build quality."
+                    },
+                    {
+                        text: "$500-$800",
+                        info: "Mid-range laptops with better performance. Good for everyday use and light multitasking with improved build quality."
+                    },
+                    {
+                        text: "$800-$1200",
+                        info: "Upper mid-range with potential for gaming and content creation. Better processors and possibly dedicated graphics."
+                    },
+                    {
+                        text: "$1200-$2000",
+                        info: "High-end laptops with premium features, excellent performance, and build quality. Suitable for demanding tasks."
+                    },
+                    {
+                        text: "Above $2000",
+                        info: "Top-tier laptops with the best specifications, premium materials, and cutting-edge features."
+                    }
+                ]
             },
             {
                 question: "How important is portability to you?",
-                options: ["Very important - I travel frequently", "Somewhat important", "Not important - It'll stay on my desk", "Balance of performance and portability"]
+                options: [
+                    {
+                        text: "Very important - I travel frequently",
+                        info: "Lightweight laptops (under 3.5 lbs) with excellent battery life. Ideal for frequent travelers and commuters."
+                    },
+                    {
+                        text: "Somewhat important",
+                        info: "Mid-weight laptops (3.5-5 lbs) balancing portability and performance."
+                    },
+                    {
+                        text: "Not important - It'll stay on my desk",
+                        info: "Performance-focused laptops without weight constraints. Can include larger screens and better cooling."
+                    },
+                    {
+                        text: "Balance of performance and portability",
+                        info: "Moderate weight laptops with good performance and reasonable portability."
+                    }
+                ]
             },
             {
                 question: "What size screen do you prefer?",
-                options: ["13-14 inch", "15-16 inch", "17 inch or larger"]
+                options: [
+                    {
+                        text: "13-14 inch",
+                        info: "Most portable size, perfect for frequent travelers. Good balance of usability and mobility."
+                    },
+                    {
+                        text: "15-16 inch",
+                        info: "Standard size offering good screen real estate while maintaining reasonable portability."
+                    },
+                    {
+                        text: "17 inch or larger",
+                        info: "Desktop replacement size. Best for stationary use and maximum screen space."
+                    }
+                ]
             },
             {
                 question: "How much storage do you need?",
-                options: ["256GB", "512GB", "1TB", "2TB or more"]
+                options: [
+                    {
+                        text: "256GB",
+                        info: "Basic storage suitable for documents and light media. Good for cloud-dependent users."
+                    },
+                    {
+                        text: "512GB",
+                        info: "Balanced storage for most users. Good for moderate media collections and games."
+                    },
+                    {
+                        text: "1TB",
+                        info: "Large storage for media professionals and gamers. Suitable for large file collections."
+                    },
+                    {
+                        text: "2TB or more",
+                        info: "Maximum storage for professional work. Ideal for video editors and content creators."
+                    }
+                ]
             },
             {
                 question: "Do you plan to play games on this laptop?",
-                options: ["No gaming", "Light gaming", "Moderate gaming", "Heavy gaming"]
+                options: [
+                    {
+                        text: "No gaming",
+                        info: "Basic integrated graphics sufficient for everyday tasks and media consumption."
+                    },
+                    {
+                        text: "Light gaming",
+                        info: "Entry-level dedicated graphics or good integrated graphics for casual games and esports titles."
+                    },
+                    {
+                        text: "Moderate gaming",
+                        info: "Mid-range dedicated graphics card for modern games at medium-high settings."
+                    },
+                    {
+                        text: "Heavy gaming",
+                        info: "High-end graphics card for latest games at high settings and better frame rates."
+                    }
+                ]
             },
             {
                 question: "How many programs do you typically run simultaneously?",
-                options: ["1-3 programs", "4-6 programs", "7+ programs"]
+                options: [
+                    {
+                        text: "1-3 programs",
+                        info: "Basic multitasking needs. 8GB RAM and entry-level processor would be sufficient."
+                    },
+                    {
+                        text: "4-6 programs",
+                        info: "Moderate multitasking. 16GB RAM and mid-range processor recommended."
+                    },
+                    {
+                        text: "7+ programs",
+                        info: "Heavy multitasking. 32GB+ RAM and high-performance processor needed."
+                    }
+                ]
             },
             {
                 question: "Do you need special features?",
-                options: ["Touchscreen", "Long battery life", "High color accuracy", "Thunderbolt ports", "None specifically"]
+                options: [
+                    {
+                        text: "Touchscreen",
+                        info: "Adds interactivity and tablet-like functionality. Useful for artists and note-takers."
+                    },
+                    {
+                        text: "Long battery life",
+                        info: "Laptops with efficient processors and larger batteries for 8+ hours of use."
+                    },
+                    {
+                        text: "High color accuracy",
+                        info: "Premium displays with better color coverage. Essential for content creators and designers."
+                    },
+                    {
+                        text: "Thunderbolt ports",
+                        info: "High-speed connectivity for external GPUs, displays, and fast data transfer."
+                    },
+                    {
+                        text: "None specifically",
+                        info: "Standard features are sufficient for your needs."
+                    }
+                ]
             },
             {
                 question: "How important is build quality?",
-                options: ["Premium build is a must", "Balanced build quality", "Basic build is fine"]
+                options: [
+                    {
+                        text: "Premium build is a must",
+                        info: "Metal construction, robust hinges, and premium materials for durability and aesthetics."
+                    },
+                    {
+                        text: "Balanced build quality",
+                        info: "Mix of metal and quality plastic components. Good durability at a reasonable price."
+                    },
+                    {
+                        text: "Basic build is fine",
+                        info: "Standard plastic construction. Focuses budget on internal components rather than build materials."
+                    }
+                ]
             },
             {
                 question: "What's your preferred brand?",
-                options: ["Dell", "HP", "Lenovo", "Apple", "ASUS", "No preference"]
+                options: [
+                    {
+                        text: "Dell",
+                        info: "Known for XPS premium line and good business laptops. Strong customer support and build quality."
+                    },
+                    {
+                        text: "HP",
+                        info: "Wide range from budget to premium. Strong business laptops and good consumer options."
+                    },
+                    {
+                        text: "Lenovo",
+                        info: "Famous for ThinkPad business line. Good build quality and keyboard design."
+                    },
+                    {
+                        text: "Apple",
+                        info: "Premium build quality, excellent displays, and strong integration with Apple ecosystem."
+                    },
+                    {
+                        text: "ASUS",
+                        info: "Good gaming laptops and value-oriented options. Strong ROG gaming line."
+                    },
+                    {
+                        text: "No preference",
+                        info: "Open to any brand that meets your requirements and budget."
+                    }
+                ]
             }
         ];
 
@@ -258,7 +476,13 @@
                     <div class="question">${question.question}</div>
                     <div class="options">
                         ${question.options.map((option, i) => `
-                            <div class="option" onclick="selectOption(${i})">${option}</div>
+                            <div class="option" onclick="selectOption(${i})">
+                                <span>${option.text}</span>
+                                <span class="info-icon">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span class="tooltip">${option.info}</span>
+                                </span>
+                            </div>
                         `).join('')}
                     </div>
                     <div class="navigation">
